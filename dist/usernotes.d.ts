@@ -100,7 +100,7 @@ export declare function migrateUsernotesToLatestSchema(data: any): RawUsernotesD
 export declare class UsernotesData {
     constants: RawUsernotesConstants;
     users: RawUsernotesUsers;
-    constructor(data: any);
+    constructor(jsonString: string);
     /**
      * Adds a new usernote to a user.
      * @param username The user to add the note to

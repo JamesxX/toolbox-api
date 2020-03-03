@@ -126,7 +126,8 @@ exports.migrateUsernotesToLatestSchema = migrateUsernotesToLatestSchema;
  * handle blob compression, note permalink squashing, etc.
  */
 class UsernotesData {
-    constructor(data) {
+    constructor(jsonString) {
+        let data = JSON.parse(jsonString);
         data = migrateUsernotesToLatestSchema(data);
         this.users = decompressBlob(data.blob);
         this.constants = data.constants;
