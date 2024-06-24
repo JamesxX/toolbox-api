@@ -1,46 +1,51 @@
-# toolbox-api
+# toolbox-devvit [![npm version](https://img.shields.io/npm/v/toolbox-devvit.svg)](https://www.npmjs.com/package/toolbox-devvit)
 
-Helpers for interfacing with Reddit Moderator Toolbox settings and usernotes.
+Helpers for working with /r/toolbox data from Devvit community apps. [Read the documentation.](https://toolbox-team.github.io/toolbox-devvit/)
 
 ## Installation
 
 ```bash
-npm install --production @eritbh/toolbox-api
+npm install --production toolbox-devvit
 ```
 
 ## Usage Example
 
-```js
-const {UsernotesData} = require('toolbox-api');
+```ts
+import {Devvit} from '@devvit/public-api';
+import {ToolboxClient} from 'toolbox-devvit';
 
-// Get your data however you want
-const data = '{"ver":6, ...}';
+Devvit.configure({
+	redditAPI: true,
+	// ...
+});
 
-// Create a UsernotesData instance
-const usernotes = new UsernotesData(data);
+// A simple action that creates a usernote on a post's author
+Devvit.addMenuItem({
+	location: 'post',
+	label: 'Create Test Usernote',
+	description: 'Creates a Toolbox usernote for testing',
+	onPress: async (event, {reddit, ui, postId}) => {
+		const subredditName = (await reddit.getCurrentSubreddit()).name;
+		const username = (await reddit.getPostById(postId!)).authorName;
+		const text = 'Hihi i am a note';
+		const wikiRevisionReason = 'Create note via my custom app';
 
-// Add a usernote to a user
-usernotes.addUsernote('someone', 'wears the freshest clothes');
+		const toolbox = new ToolboxClient(reddit);
+		await toolbox.addUsernote(subredditName, {
+			username,
+			text,
+		}, wikiRevisionReason);
 
-// Directly modify the underlying usernote objects
-usernotes.users['someone'].ns[0].n += '... or do they?';
+		ui.showToast({
+			appearance: 'success',
+			text: 'Note added!',
+		});
+	},
+});
 
-// Get all the usernotes for a user, with more helpful object keys
-usernotes.notesForUser('someone')
-//=> [
-//     {
-//       text: 'wears the freshest clothes... or do they?',
-//       timestamp: 2020-03-03T02:13:10.042Z,
-//       link: undefined,
-//     },
-//     ...
-//   ]
-
-// Generate compressed JSON to write back to the wiki page
-JSON.stringify(usernotes)
-//=> '{"ver":6, ...}'
+export default Devvit;
 ```
 
 ## License
 
-[MIT &copy; eritbh](/LICENSE)
+[MIT &copy; the toolbox team](/LICENSE)
